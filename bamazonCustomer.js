@@ -49,29 +49,36 @@ function runSearch() {
                     // console.log(foundObj)
                     
                     // if product id matches then deduct the user's quantity 
-                    console.log("stock_quantity", stock)
-                    newQuant = stock - answer.quantity
+                    console.log("stock_quantity", stock);
+                    newQuant = stock - answer.quantity;
                     console.log("newQuant: ", newQuant);
                 }
             }
             //UPDATE Customers
             //SET ContactName='Alfred Schmidt', City='Frankfurt'
             //WHERE CustomerID=1
-            connection.query("UPDATE products SET ? WHERE ?",
-            [
-              {
-                stock_quantity: newQuant
-              },
-              {
-                id: chosenId
-              }
-            ],
-            function(error) {
-              if (error) throw err;
-              console.log("Items purchased successfully!");
-            //   start();
-            })
-            runSearch();
+
+            if (newQuant >= 0 && answer.quantity >= 0) {
+                connection.query("UPDATE products SET ? WHERE ?",
+                [
+                    {
+                        stock_quantity: newQuant
+                    },
+                    {
+                    id: chosenId
+                }
+                ],
+                function(error) {
+                    if (error) throw err;
+                    console.log("Items purchased successfully!");
+                    runSearch();
+                })
+            } else {
+                // newQuant is negative
+                console.log("Insufficient quantity!");
+                runSearch();
+            }
+            
         });
     });
 }
